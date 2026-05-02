@@ -749,48 +749,44 @@ const Controller = () => {
             )}
           </div>
 
-          <div className="presenter-controls-bar">
+          <div className="presenter-mini-bar">
+            <div className="v-tag">v2</div>
             <button 
               className={`presenter-btn ${liveState.type === 'CLEAR' ? 'active' : ''}`}
               onClick={() => handleControl('CLEAR')}
-              title="Clear"
             >
-              <Eraser size={12} />
+              <Eraser size={10} />
             </button>
             
             <button 
               className={`presenter-btn ${liveState.type === 'LOGO' ? 'active' : ''}`}
               onClick={() => handleControl('LOGO')}
-              title="Logo"
             >
-              <ImageIcon size={12} />
+              <ImageIcon size={10} />
             </button>
             
             <button 
               className="presenter-btn" 
               onClick={prevSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === 0}
-              title="Previous Slide"
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={12} />
             </button>
 
             <button 
               className="presenter-btn" 
               onClick={nextSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === liveState.content.split('\n\n').length - 1}
-              title="Next Slide"
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={12} />
             </button>
 
             {(previewSong || liveState.type === 'SLIDE') && (
               <button 
                 className="presenter-btn go-live-btn"
                 onClick={() => goLive()}
-                title="Go Live"
               >
-                <Send size={12} />
+                <Send size={10} />
               </button>
             )}
           </div>
