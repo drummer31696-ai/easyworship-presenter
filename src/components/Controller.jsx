@@ -749,43 +749,48 @@ const Controller = () => {
             )}
           </div>
 
-          <div className="presenter-controls-bar glass-morphism">
+          <div className="presenter-controls-bar">
             <button 
               className={`presenter-btn ${liveState.type === 'CLEAR' ? 'active' : ''}`}
               onClick={() => handleControl('CLEAR')}
+              title="Clear"
             >
-              <Eraser size={14} /> Clear
+              <Eraser size={12} />
             </button>
             
             <button 
               className={`presenter-btn ${liveState.type === 'LOGO' ? 'active' : ''}`}
               onClick={() => handleControl('LOGO')}
+              title="Logo"
             >
-              <ImageIcon size={14} /> Logo
+              <ImageIcon size={12} />
             </button>
             
             <button 
-              className="presenter-btn nav-btn" 
+              className="presenter-btn" 
               onClick={prevSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === 0}
+              title="Previous Slide"
             >
-              <ChevronLeft size={16} /> Prev
+              <ChevronLeft size={14} />
             </button>
 
             <button 
-              className="presenter-btn nav-btn" 
+              className="presenter-btn" 
               onClick={nextSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === liveState.content.split('\n\n').length - 1}
+              title="Next Slide"
             >
-              Next <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
 
             {(previewSong || liveState.type === 'SLIDE') && (
               <button 
                 className="presenter-btn go-live-btn"
                 onClick={() => goLive()}
+                title="Go Live"
               >
-                <Send size={14} /> GO LIVE
+                <Send size={12} />
               </button>
             )}
           </div>
