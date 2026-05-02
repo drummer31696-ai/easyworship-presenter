@@ -1,0 +1,54 @@
+.projector-screen {
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  color: white;
+  font-family: 'Outfit', sans-serif;
+  text-align: center;
+}
+.projector-screen.slide {
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+              url('https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+  background-size: cover;
+  background-position: center;
+}
+.projector-screen.logo {
+  background: var(--bg-darker);
+}
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, transparent 20%, black 150%);
+  pointer-events: none;
+}
+.slide-container {
+  width: 80%;
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+  z-index: 10;
+  white-space: pre-line;
+}
+.logo-display {
+  font-size: 6rem;
+  letter-spacing: 10px;
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+@keyframes fadeInProjector {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in {
+  animation: fadeInProjector 0.5s ease-out;
+}
