@@ -162,6 +162,19 @@ const Controller = () => {
     s.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const enterPresenterMode = () => {
+    setIsFullscreenPresenter(true);
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  };
+
+  const exitPresenterMode = () => {
+    setIsFullscreenPresenter(false);
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  };
+
   const handleSelectPreview = (song) => {
     setPreviewSong(song);
     setPreviewSlideIndex(0);
@@ -558,7 +571,7 @@ const Controller = () => {
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <button 
               className="header-quick-btn" 
-              onClick={() => setIsFullscreenPresenter(true)}
+              onClick={() => enterPresenterMode()}
               title="Fullscreen Presenter Mode"
             >
               <Maximize size={16} /> PRESENTER MODE
@@ -718,8 +731,8 @@ const Controller = () => {
           }}
         >
           <button 
-            className="close-fullscreen-btn" 
-            onClick={() => setIsFullscreenPresenter(false)}
+            className="close-fullscreen-btn"
+            onClick={() => exitPresenterMode()}
           >
             <Minimize size={24} />
           </button>
@@ -741,14 +754,14 @@ const Controller = () => {
               className={`presenter-btn ${liveState.type === 'CLEAR' ? 'active' : ''}`}
               onClick={() => handleControl('CLEAR')}
             >
-              <Eraser size={20} /> Clear
+              <Eraser size={14} /> Clear
             </button>
             
             <button 
               className={`presenter-btn ${liveState.type === 'LOGO' ? 'active' : ''}`}
               onClick={() => handleControl('LOGO')}
             >
-              <ImageIcon size={20} /> Logo
+              <ImageIcon size={14} /> Logo
             </button>
             
             <button 
@@ -756,7 +769,7 @@ const Controller = () => {
               onClick={prevSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === 0}
             >
-              <ChevronLeft size={24} /> Prev
+              <ChevronLeft size={16} /> Prev
             </button>
 
             <button 
@@ -764,15 +777,15 @@ const Controller = () => {
               onClick={nextSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === liveState.content.split('\n\n').length - 1}
             >
-              Next <ChevronRight size={24} />
+              Next <ChevronRight size={16} />
             </button>
 
-            {previewSong && (
+            {(previewSong || liveState.type === 'SLIDE') && (
               <button 
                 className="presenter-btn go-live-btn"
                 onClick={() => goLive()}
               >
-                <Send size={20} /> GO LIVE
+                <Send size={14} /> GO LIVE
               </button>
             )}
           </div>
