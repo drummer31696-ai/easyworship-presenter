@@ -35,3 +35,21 @@ export const subscribeToLiveUpdates = (callback) => {
     }
   });
 };
+
+// Update Song Library in the cloud
+export const saveLibraryToCloud = (songs) => {
+  set(ref(db, 'library'), songs);
+};
+
+// Listen for Library changes from the cloud
+export const subscribeToLibraryUpdates = (callback) => {
+  const libraryRef = ref(db, 'library');
+  return onValue(libraryRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      callback(Array.isArray(data) ? data : Object.values(data));
+    } else {
+      callback([]); // Empty library
+    }
+  });
+};

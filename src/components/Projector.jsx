@@ -7,7 +7,9 @@ const Projector = () => {
     type: 'CLEAR',
     title: '',
     content: '',
-    slideIndex: 0
+    slideIndex: 0,
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+    logoUrl: null
   });
 
   useEffect(() => {
@@ -19,7 +21,17 @@ const Projector = () => {
 
   const getSlideContent = () => {
     if (liveState.type === 'BLACK') return null;
-    if (liveState.type === 'LOGO') return <div className="logo-display">CHURCH LOGO</div>;
+    if (liveState.type === 'LOGO') {
+      return (
+        <div className="logo-display">
+          {liveState.logoUrl ? (
+            <img src={liveState.logoUrl} alt="Church Logo" className="live-logo" />
+          ) : (
+            "CHURCH LOGO"
+          )}
+        </div>
+      );
+    }
     if (liveState.type === 'CLEAR') return null;
     
     const slides = liveState.content.split('\n\n');
@@ -27,7 +39,14 @@ const Projector = () => {
   };
 
   return (
-    <div className={`projector-screen ${liveState.type.toLowerCase()}`}>
+    <div 
+      className={`projector-screen ${liveState.type.toLowerCase()}`}
+      style={{ 
+        background: liveState.background || 'var(--bg-darker)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
       <div className="background-overlay"></div>
       
       <div className="slide-container animate-fade-in" key={`${liveState.title}-${liveState.slideIndex}`}>
