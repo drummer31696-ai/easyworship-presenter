@@ -928,3 +928,172 @@
 .presenter-btn.go-live-btn:hover {
   background: rgba(239, 68, 68, 0.9);
 }
+
+/* ===== MOBILE / PHONE RESPONSIVE ===== */
+
+/* Phone Landscape - Stack the 3 panes into scrollable tabs */
+@media screen and (max-width: 1024px) {
+  .controller-container {
+    grid-template-columns: 250px 1fr 280px;
+    gap: 10px;
+    padding: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .controller-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 100vh;
+    padding: 8px;
+    gap: 8px;
+    overflow-y: auto;
+  }
+
+  .pane {
+    max-height: 50vh;
+    min-height: 200px;
+  }
+
+  .library-pane {
+    max-height: 35vh;
+  }
+
+  .preview-pane {
+    max-height: 45vh;
+  }
+
+  .control-pane {
+    max-height: none;
+  }
+
+  .pane-header {
+    padding: 10px;
+  }
+
+  .pane-header h3 {
+    font-size: 0.85rem;
+  }
+
+  .pane-content {
+    padding: 8px;
+  }
+
+  .preview-slides-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .preview-slide {
+    font-size: 0.6rem;
+    padding: 8px;
+  }
+
+  .live-output-section {
+    padding: 8px;
+    margin: 8px;
+  }
+
+  .tablet-nav-controls .nav-btn {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .bg-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .song-card {
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+
+  .song-card h4 {
+    font-size: 0.8rem;
+  }
+
+  .card-actions {
+    opacity: 1;
+  }
+}
+
+/* Very small phones in landscape */
+@media screen and (max-height: 450px) {
+  .controller-container {
+    grid-template-columns: 200px 1fr 220px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .pane {
+    max-height: none;
+    min-height: unset;
+  }
+
+  .pane-header {
+    padding: 6px 8px;
+  }
+
+  .pane-header h3 {
+    font-size: 0.75rem;
+  }
+
+  .pane-content {
+    padding: 6px;
+  }
+
+  .preview-slides-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 6px;
+  }
+
+  .live-output-section {
+    padding: 6px;
+    margin: 4px;
+  }
+
+  .tablet-nav-controls {
+    padding: 6px;
+  }
+
+  .tablet-nav-controls .nav-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .tablet-nav-controls .slide-counter {
+    font-size: 0.85rem;
+  }
+}
+
+/* Fullscreen presenter on phone - same tiny buttons */
+@media screen and (max-width: 768px) {
+  .presenter-lyrics-display {
+    padding: 10px 20px 40px 20px;
+  }
+
+  .presenter-lyrics-display p {
+    font-size: 6vw;
+  }
+
+  .close-fullscreen-btn {
+    top: 6px;
+    right: 6px;
+    padding: 4px;
+  }
+
+  .presenter-controls-bar {
+    bottom: 4px;
+    padding: 2px 3px;
+  }
+
+  .presenter-btn {
+    padding: 4px 5px;
+  }
+
+  .presenter-btn svg {
+    width: 11px;
+    height: 11px;
+  }
+}
