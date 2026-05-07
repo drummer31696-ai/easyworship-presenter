@@ -923,6 +923,7 @@
   text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
   white-space: pre-wrap;
   max-width: 90%;
+  text-transform: uppercase;
 }
 
 .presenter-lyrics-display .off-air-text {
