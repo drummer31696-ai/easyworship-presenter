@@ -86,6 +86,7 @@ const Controller = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [notification, setNotification] = useState(null);
   const [isFullscreenPresenter, setIsFullscreenPresenter] = useState(false);
+  const [isEditorExpanded, setIsEditorExpanded] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -434,6 +435,7 @@ const Controller = () => {
     setIsManualMode(false);
     setManualLyrics('');
     setEditingSongId(null);
+    setIsEditorExpanded(false);
   };
 
   const [previewMode, setPreviewMode] = useState('SLIDES'); // SLIDES or LYRICS
@@ -466,11 +468,18 @@ const Controller = () => {
       
       {/* Import Modal */}
       {showImportModal && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-morphism animate-fade-in">
+        <div className={`modal-overlay ${isEditorExpanded ? 'expanded' : ''}`}>
+          <div className={`modal-content glass-morphism animate-fade-in ${isEditorExpanded ? 'expanded' : ''}`}>
             <div className="modal-header">
               <h3>{editingSongId ? 'Edit Song' : (isManualMode ? 'Manual Entry' : 'Search & Add Song')}</h3>
-              <button onClick={closeModal}><X size={18} /></button>
+              <div className="modal-header-actions">
+                {isManualMode && (
+                  <button onClick={() => setIsEditorExpanded(!isEditorExpanded)} title={isEditorExpanded ? "Minimize" : "Expand"}>
+                    {isEditorExpanded ? <Minimize size={18} /> : <Maximize size={18} />}
+                  </button>
+                )}
+                <button onClick={closeModal}><X size={18} /></button>
+              </div>
             </div>
             <div className="modal-body">
               {!isManualMode ? (
@@ -853,14 +862,14 @@ const Controller = () => {
               className={`presenter-btn ${liveState.type === 'CLEAR' ? 'active' : ''}`}
               onClick={() => handleControl('CLEAR')}
             >
-              <Eraser size={10} />
+              <Eraser size={20} />
             </button>
             
             <button 
               className={`presenter-btn ${liveState.type === 'LOGO' ? 'active' : ''}`}
               onClick={() => handleControl('LOGO')}
             >
-              <ImageIcon size={10} />
+              <ImageIcon size={20} />
             </button>
             
             <button 
@@ -868,7 +877,7 @@ const Controller = () => {
               onClick={prevSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === 0}
             >
-              <ChevronLeft size={12} />
+              <ChevronLeft size={24} />
             </button>
 
             <button 
@@ -876,7 +885,7 @@ const Controller = () => {
               onClick={nextSlide}
               disabled={liveState.type !== 'SLIDE' || liveState.slideIndex === liveState.content.split('\n\n').length - 1}
             >
-              <ChevronRight size={12} />
+              <ChevronRight size={24} />
             </button>
 
             {(previewSong || liveState.type === 'SLIDE') && (
@@ -884,7 +893,7 @@ const Controller = () => {
                 className="presenter-btn go-live-btn"
                 onClick={() => goLive()}
               >
-                <Send size={10} />
+                <Send size={20} />
               </button>
             )}
           </div>

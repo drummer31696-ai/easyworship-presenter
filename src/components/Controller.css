@@ -53,6 +53,29 @@
   width: 100%;
   max-width: 400px;
   padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.modal-content.expanded {
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.modal-content.expanded .modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 .modal-header {
   display: flex;
@@ -201,6 +224,24 @@
   color: white;
   resize: vertical;
   font-family: inherit;
+  transition: height 0.3s ease;
+}
+
+.modal-content.expanded .manual-form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content.expanded .input-group:last-of-type {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content.expanded textarea {
+  flex: 1;
+  resize: none;
 }
 .modal-actions {
   display: flex;
@@ -758,14 +799,14 @@
 .tablet-nav-controls .nav-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 12px 20px;
+  gap: 8px;
+  padding: 16px 28px;
   background: var(--primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -904,17 +945,17 @@
 
 .presenter-mini-bar {
   position: fixed;
-  bottom: 4px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 1px;
-  padding: 1px 3px;
-  border-radius: 15px;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(139, 92, 246, 0.3); /* Purple border to see update */
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10001;
 }
 
@@ -932,17 +973,18 @@
   justify-content: center;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.2s;
-  padding: 3px 4px;
-  border-radius: 10px;
-  min-width: unset;
+  padding: 12px;
+  border-radius: 12px;
+  min-width: 50px;
+  min-height: 50px;
 }
 
 .presenter-btn svg {
-  width: 10px !important;
-  height: 10px !important;
+  width: 24px !important;
+  height: 24px !important;
 }
 
 .presenter-btn:hover:not(:disabled) {
@@ -1107,36 +1149,43 @@
 /* Fullscreen presenter on phone - same tiny buttons, smaller lyrics */
 @media screen and (max-width: 768px) {
   .presenter-lyrics-display {
-    padding: 8px 16px 30px 16px;
+    padding: 8px 16px 150px 16px;
   }
 
   .presenter-lyrics-display p {
-    font-size: 3.5vw;
+    font-size: 6vw;
     max-width: 95%;
   }
 
   .close-fullscreen-btn {
-    top: 4px;
-    right: 4px;
-    padding: 3px;
+    top: 25px;
+    right: 25px;
+    padding: 15px;
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.6);
   }
 
   .close-fullscreen-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 40px !important;
+    height: 40px !important;
   }
 
-  .presenter-controls-bar {
-    bottom: 3px;
-    padding: 2px 3px;
+  .presenter-mini-bar {
+    bottom: 40px;
+    gap: 20px;
+    padding: 15px 30px;
+    border-radius: 60px;
+    background: rgba(0, 0, 0, 0.9);
   }
 
   .presenter-btn {
-    padding: 3px 5px;
+    padding: 20px;
+    min-width: 85px;
+    min-height: 85px;
   }
 
   .presenter-btn svg {
-    width: 10px;
-    height: 10px;
+    width: 45px !important;
+    height: 45px !important;
   }
 }
