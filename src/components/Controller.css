@@ -286,6 +286,111 @@
   color: white;
   font-size: 0.9rem;
 }
+
+.library-tabs {
+  display: flex;
+  background: var(--bg-dark);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 12px;
+}
+.library-tabs button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.library-tabs button.active {
+  background: var(--bg-light);
+  color: var(--primary);
+}
+
+.bible-search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bible-form-row select, .bible-form-row input {
+  width: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--glass-border);
+  padding: 8px;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.9rem;
+}
+.bible-form-row.multi {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.input-field label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.bible-fetch-btn {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+}
+.bible-recent-hints {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 20px;
+}
+.hint-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 80%;
+}
+.niv-badge {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 1px solid var(--primary);
+}
+.add-to-lib-btn {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.add-to-lib-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
 .pane-content {
   flex: 1;
   padding: 16px;

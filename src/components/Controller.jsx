@@ -87,6 +87,15 @@ const Controller = () => {
   const [notification, setNotification] = useState(null);
   const [isFullscreenPresenter, setIsFullscreenPresenter] = useState(false);
   const [isEditorExpanded, setIsEditorExpanded] = useState(false);
+  const [libraryTab, setLibraryTab] = useState('SONGS'); // SONGS or BIBLE
+  const [bibleSearch, setBibleSearch] = useState({
+    book: 1,
+    chapter: 1,
+    verse: 1,
+    verseEnd: 1
+  });
+  const [bibleBooks, setBibleBooks] = useState([]);
+  const [isFetchingBible, setIsFetchingBible] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -153,6 +162,70 @@ const Controller = () => {
     }, 600); // Wait 600ms after typing
     return () => clearTimeout(timer);
   }, [importQuery, editingSongId]);
+
+  // Fetch Bible Books
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch('https://bolls.life/get-books/NIV/');
+        const data = await response.json();
+        setBibleBooks(data);
+      } catch (e) {
+        console.error("Failed to fetch Bible books:", e);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  const fetchBibleVerses = async () => {
+    setIsFetchingBible(true);
+    try {
+      const { book, chapter, verse, verseEnd } = bibleSearch;
+      const response = await fetch(`https://bolls.life/get-text/NIV/${book}/${chapter}/`);
+      const data = await response.json();
+      
+      // Filter verses based on range
+      const selectedVerses = data.filter(v => v.verse >= verse && v.verse <= (verseEnd || verse));
+      
+      if (selectedVerses.length > 0) {
+        const bookName = bibleBooks.find(b => b.bookid === parseInt(book))?.name || "Bible";
+        const content = selectedVerses.map(v => v.text.replace(/<[^>]*>/g, '')).join('\n\n');
+        const title = `${bookName} ${chapter}:${verse}${verseEnd > verse ? '-' + verseEnd : ''}`;
+        
+        const bibleSong = {
+          id: `bible-${Date.now()}`,
+          title: title.toUpperCase(),
+          content: content.toUpperCase(),
+          artist: 'BIBLE (NIV)',
+          isBible: true
+        };
+        
+        setPreviewSong(bibleSong);
+        setPreviewSlideIndex(0);
+        showNotification("Bible verse loaded!", "success");
+      } else {
+        showNotification("Verse not found.", "error");
+      }
+    } catch (e) {
+      console.error("Bible fetch failed:", e);
+      showNotification("Failed to fetch Bible verse.", "error");
+    } finally {
+      setIsFetchingBible(false);
+    }
+  };
+
+  const saveBibleToLibrary = () => {
+    if (!previewSong || !previewSong.isBible) return;
+    const newSong = {
+      ...previewSong,
+      id: Date.now(),
+      isBible: false // Once saved, treat it like a regular song
+    };
+    const newSongs = [newSong, ...songs];
+    setSongs(newSongs);
+    saveLibraryToCloud(newSongs);
+    showNotification("Added to library!", "success");
+  };
 
   const [liveState, setLiveState] = useState({
     title: "",
@@ -558,41 +631,118 @@ const Controller = () => {
       {/* Pane 1: Library */}
       <div className="pane library-pane glass-morphism">
         <div className="pane-header">
-          <div className="title-row">
-            <h3><Search size={18} /> Library</h3>
-            <button className="add-btn" onClick={() => setShowImportModal(true)} title="Import Song">
-              <Plus size={18} />
+          <div className="library-tabs">
+            <button 
+              className={libraryTab === 'SONGS' ? 'active' : ''} 
+              onClick={() => setLibraryTab('SONGS')}
+            >
+              Songs
+            </button>
+            <button 
+              className={libraryTab === 'BIBLE' ? 'active' : ''} 
+              onClick={() => setLibraryTab('BIBLE')}
+            >
+              Bible
             </button>
           </div>
-          <input 
-            type="text" 
-            placeholder="Search songs..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          
+          {libraryTab === 'SONGS' ? (
+            <>
+              <div className="title-row">
+                <h3><Search size={18} /> Library</h3>
+                <button className="add-btn" onClick={() => setShowImportModal(true)} title="Import Song">
+                  <Plus size={18} />
+                </button>
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search songs..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </>
+          ) : (
+            <div className="bible-search-container animate-fade-in">
+              <div className="bible-form-row">
+                <select 
+                  value={bibleSearch.book} 
+                  onChange={e => setBibleSearch({...bibleSearch, book: e.target.value, chapter: 1, verse: 1})}
+                >
+                  {bibleBooks.map(b => (
+                    <option key={b.bookid} value={b.bookid}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="bible-form-row multi">
+                <div className="input-field">
+                  <label>Chapter</label>
+                  <input 
+                    type="number" 
+                    value={bibleSearch.chapter} 
+                    onChange={e => setBibleSearch({...bibleSearch, chapter: parseInt(e.target.value) || 1})}
+                    min="1"
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Verse</label>
+                  <input 
+                    type="number" 
+                    value={bibleSearch.verse} 
+                    onChange={e => setBibleSearch({...bibleSearch, verse: parseInt(e.target.value) || 1, verseEnd: Math.max(bibleSearch.verseEnd, parseInt(e.target.value) || 1)})}
+                    min="1"
+                  />
+                </div>
+                <div className="input-field">
+                  <label>To</label>
+                  <input 
+                    type="number" 
+                    value={bibleSearch.verseEnd} 
+                    onChange={e => setBibleSearch({...bibleSearch, verseEnd: parseInt(e.target.value) || bibleSearch.verse})}
+                    min={bibleSearch.verse}
+                  />
+                </div>
+              </div>
+              <button className="primary-btn bible-fetch-btn" onClick={fetchBibleVerses} disabled={isFetchingBible}>
+                {isFetchingBible ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} 
+                {isFetchingBible ? 'Fetching...' : 'Get Verse'}
+              </button>
+            </div>
+          )}
         </div>
         <div className="pane-content scrollable">
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext 
-              items={filteredSongs.map(s => s.id)}
-              strategy={verticalListSortingStrategy}
+          {libraryTab === 'SONGS' ? (
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              {filteredSongs.map(song => (
-                <SortableSongCard
-                  key={song.id}
-                  song={song}
-                  isSelected={previewSong?.id === song.id}
-                  onSelect={handleSelectPreview}
-                  onEdit={startEditSong}
-                  onDelete={deleteSong}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+              <SortableContext 
+                items={filteredSongs.map(s => s.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {filteredSongs.map(song => (
+                  <SortableSongCard
+                    key={song.id}
+                    song={song}
+                    isSelected={previewSong?.id === song.id}
+                    onSelect={handleSelectPreview}
+                    onEdit={startEditSong}
+                    onDelete={deleteSong}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <div className="bible-recent-hints">
+              <p className="hint-text">Select a book, chapter, and verse range above to load into preview.</p>
+              {previewSong?.isBible && (
+                <button className="add-to-lib-btn animate-fade-in" onClick={saveBibleToLibrary}>
+                  <Plus size={16} /> Save this verse to Library
+                </button>
+              )}
+              <div className="niv-badge">NIV Version</div>
+            </div>
+          )}
         </div>
       </div>
 
