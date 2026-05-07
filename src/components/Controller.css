@@ -254,6 +254,9 @@
   flex: 1;
 }
 .song-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 12px;
   border-radius: 8px;
   background: var(--glass);
@@ -261,6 +264,31 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
+}
+.drag-handle {
+  cursor: grab;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px; /* Bigger touch target */
+  border-radius: 4px;
+  transition: all 0.2s;
+  touch-action: none; /* Only the handle prevents scrolling */
+}
+.drag-handle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary);
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+.song-card.dragging {
+  background: var(--bg-light) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  transform: scale(1.02);
+  z-index: 1000;
 }
 .song-card:hover {
   background: var(--bg-light);
@@ -276,6 +304,9 @@
   transition: opacity 0.2s;
 }
 
+.song-card.dragging .card-actions {
+  display: none;
+}
 .song-card:hover .card-actions {
   opacity: 1;
 }
@@ -355,6 +386,7 @@
   font-size: 0.9rem;
   line-height: 1.6;
   color: var(--text-muted);
+  text-transform: uppercase;
 }
 
 .preview-slides-grid {
@@ -376,6 +408,7 @@
   justify-content: center;
   text-align: center;
   transition: all 0.2s;
+  text-transform: uppercase;
 }
 .preview-slide:hover {
   border-color: var(--primary);
@@ -524,6 +557,7 @@
 .live-content p {
   font-size: 0.8rem;
   line-height: 1.4;
+  text-transform: uppercase;
 }
 .live-placeholder {
   color: var(--text-muted);

@@ -1,8 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Play, Monitor, Square, Eraser, Image as ImageIcon, Send, Wifi, WifiOff, Plus, Download, X, Edit2, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
+import { Search, Play, Monitor, Square, Eraser, Image as ImageIcon, Send, Wifi, WifiOff, Plus, Download, X, Edit2, ChevronLeft, ChevronRight, Maximize, Minimize, Upload, Loader2, GripVertical } from 'lucide-react';
 import { sendLiveUpdate, subscribeToLiveUpdates, saveLibraryToCloud, subscribeToLibraryUpdates } from '../services/firebase';
-import { Upload, Loader2 } from 'lucide-react';
+import {
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import './Controller.css';
+
+const SortableSongCard = ({ 
+  song, 
+  isSelected, 
+  onSelect, 
+  onEdit, 
+  onDelete 
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: song.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 100 : 1,
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style}
+      className={`song-card ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
+      onClick={() => onSelect(song)}
+    >
+      <div className="drag-handle" {...attributes} {...listeners}>
+        <GripVertical size={18} />
+      </div>
+      <div className="song-card-info">
+        <h4>{song.title}</h4>
+        <p>{song.artist || 'Unknown'}</p>
+      </div>
+      <div className="card-actions">
+        <button className="edit-btn" onClick={(e) => onEdit(e, song)} title="Edit Song">
+          <Edit2 size={14} />
+        </button>
+        <button className="delete-btn" onClick={(e) => onDelete(e, song.id)} title="Delete Song">
+          <X size={14} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const Controller = () => {
   const [songs, setSongs] = useState([]);
@@ -21,6 +86,37 @@ const Controller = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [notification, setNotification] = useState(null);
   const [isFullscreenPresenter, setIsFullscreenPresenter] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = songs.findIndex((s) => s.id === active.id);
+      const newIndex = songs.findIndex((s) => s.id === over.id);
+
+      const newSongs = arrayMove(songs, oldIndex, newIndex);
+      setSongs(newSongs);
+      saveLibraryToCloud(newSongs);
+      showNotification("Library rearranged", "success");
+    }
+  };
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
@@ -203,8 +299,9 @@ const Controller = () => {
 
   const autoFormatLyrics = (text) => {
     if (!text) return "";
+    const upperText = text.toUpperCase();
     // Split by stanzas first
-    const stanzas = text.split(/\n\s*\n/).filter(s => s.trim() !== "");
+    const stanzas = upperText.split(/\n\s*\n/).filter(s => s.trim() !== "");
     const finalSlides = [];
 
     stanzas.forEach(stanza => {
@@ -295,29 +392,29 @@ const Controller = () => {
     if (!importQuery || !manualLyrics) return;
     const formattedContent = autoFormatLyrics(manualLyrics);
     
-    if (editingSongId) {
-      // Update existing song
-      const updatedSongs = songs.map(s => 
-        s.id === editingSongId ? { ...s, title: importQuery, content: formattedContent } : s
-      );
-      setSongs(updatedSongs);
-      saveLibraryToCloud(updatedSongs);
-      if (previewSong?.id === editingSongId) {
-        setPreviewSong({ ...previewSong, title: importQuery, content: formattedContent });
+      if (editingSongId) {
+        // Update existing song
+        const updatedSongs = songs.map(s => 
+          s.id === editingSongId ? { ...s, title: importQuery.toUpperCase(), content: formattedContent } : s
+        );
+        setSongs(updatedSongs);
+        saveLibraryToCloud(updatedSongs);
+        if (previewSong?.id === editingSongId) {
+          setPreviewSong({ ...previewSong, title: importQuery.toUpperCase(), content: formattedContent });
+        }
+      } else {
+        // Add new song
+        const newSong = {
+          id: Date.now(),
+          title: importQuery.toUpperCase(),
+          content: formattedContent,
+          artist: 'Manual'
+        };
+        const newSongs = [newSong, ...songs];
+        setSongs(newSongs);
+        saveLibraryToCloud(newSongs);
+        setPreviewSong(newSong);
       }
-    } else {
-      // Add new song
-      const newSong = {
-        id: Date.now(),
-        title: importQuery,
-        content: formattedContent,
-        artist: 'Manual'
-      };
-      const newSongs = [newSong, ...songs];
-      setSongs(newSongs);
-      saveLibraryToCloud(newSongs);
-      setPreviewSong(newSong);
-    }
     closeModal();
   };
 
@@ -466,26 +563,27 @@ const Controller = () => {
           />
         </div>
         <div className="pane-content scrollable">
-          {filteredSongs.map(song => (
-            <div 
-              key={song.id} 
-              className={`song-card ${previewSong?.id === song.id ? 'selected' : ''}`}
-              onClick={() => handleSelectPreview(song)}
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext 
+              items={filteredSongs.map(s => s.id)}
+              strategy={verticalListSortingStrategy}
             >
-              <div className="song-card-info">
-                <h4>{song.title}</h4>
-                <p>{song.artist || 'Unknown'}</p>
-              </div>
-              <div className="card-actions">
-                <button className="edit-btn" onClick={(e) => startEditSong(e, song)} title="Edit Song">
-                  <Edit2 size={14} />
-                </button>
-                <button className="delete-btn" onClick={(e) => deleteSong(e, song.id)} title="Delete Song">
-                  <X size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
+              {filteredSongs.map(song => (
+                <SortableSongCard
+                  key={song.id}
+                  song={song}
+                  isSelected={previewSong?.id === song.id}
+                  onSelect={handleSelectPreview}
+                  onEdit={startEditSong}
+                  onDelete={deleteSong}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
 
